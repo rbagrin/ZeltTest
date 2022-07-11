@@ -3,10 +3,9 @@ import { UserAddressService } from "./service/user-address.service";
 import { UserBankDetailsService } from "./service/user-bank.service";
 import { UserService } from "./service/user.service";
 
-export interface MatchedUser {
+export interface UserIdentifier {
   userId: number;
   identifier: string;
-  employeeID?: string | undefined;
 }
 
 export class UserEnrichmentService {
@@ -16,9 +15,9 @@ export class UserEnrichmentService {
     private readonly userBankService: UserBankDetailsService,
     private readonly integrationService: IntegrationService
   ) {}
-
-  // TODO implementation goes here
-  enrichUsers(companyId: number, matchedUsers: MatchedUser[]) {
+  
+  async enrichUsers(companyId: number, matchedLocalUsers: UserIdentifier[]) {
+    // TODO implementation goes here
     throw new Error("Method not implemented.");
   }
 }

@@ -6,19 +6,18 @@ interface HashObject {
   [key: string]: string | number | boolean;
 }
 
-export interface MatchedUser {
+export interface UserIdentifier {
   userId: number;
   identifier: string;
-  employeeID?: string | undefined;
 }
 
-export async function enrichUsers(companyId: number, matchedUsers: MatchedUser[]) {
+export async function enrichUsers(companyId: number, matchedLocalUsers: UserIdentifier[]) {
   const externalUsers = await getExternalEmployees(companyId);
   const preparedUsers = externalUsers.map((user) => ({
     ...user,
     identifier: `${user.GivenName} ${user.FamilyName}`,
   }));
-  for await (const matchedUser of matchedUsers) {
+  for await (const matchedUser of matchedLocalUsers) {
     try {
       await enrichUser(companyId, matchedUser, preparedUsers);
     } catch (err) {
@@ -29,7 +28,7 @@ export async function enrichUsers(companyId: number, matchedUsers: MatchedUser[]
 
 export async function enrichUser(
   companyId: number,
-  matchedUser: MatchedUser,
+  matchedLocalUser: UserIdentifier,
   usersWithEnrichmentIdentifier: (ExternalEmployee & { identifier: string })[]
 ): Promise<void> {
   const _enrich = async (data): Promise<void> => {
@@ -43,7 +42,7 @@ export async function enrichUser(
       }
       await updateUser(companyId, userId, user);
     };
-    await updateUserInternally(companyId, matchedUser.userId, data.user);
+    await updateUserInternally(companyId, matchedLocalUser.userId, data.user);
   };
 
   const convertData = (emailAddress: string, externalEmployee: ExternalEmployee) => {
@@ -59,8 +58,8 @@ export async function enrichUser(
     return data;
   };
 
-  const externalEmployee = usersWithEnrichmentIdentifier.find((user) => user.identifier === matchedUser.identifier);
-  const emailAddress: string | undefined = (await getUser(companyId, matchedUser.userId))?.emailAddress;
+  const externalEmployee = usersWithEnrichmentIdentifier.find((user) => user.identifier === matchedLocalUser.identifier);
+  const emailAddress: string | undefined = (await getUser(companyId, matchedLocalUser.userId))?.emailAddress;
   const data = convertData(emailAddress as string, externalEmployee as unknown as ExternalEmployee);
   _enrich(data);
 }

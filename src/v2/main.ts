@@ -2,7 +2,7 @@ import { IntegrationService } from "./service/integration.service";
 import { UserAddressService } from "./service/user-address.service";
 import { UserBankDetailsService } from "./service/user-bank.service";
 import { UserService } from "./service/user.service";
-import { MatchedUser, UserEnrichmentService } from "./user-enrichment.service";
+import { UserIdentifier, UserEnrichmentService } from "./user-enrichment.service";
 
 async function main(): Promise<void> {
   const enrichmentService = new UserEnrichmentService(
@@ -11,7 +11,7 @@ async function main(): Promise<void> {
     new UserBankDetailsService(),
     new IntegrationService()
   );
-  const matchedUsers: MatchedUser[] = [
+  const matchedUsers: UserIdentifier[] = [
     { userId: 1, identifier: "John Doe" },
     { userId: 3, identifier: "Mary Lee" },
   ];
